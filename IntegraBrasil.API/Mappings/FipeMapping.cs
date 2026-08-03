@@ -9,8 +9,8 @@ namespace IntegraBrasil.API.Mappings
         public FipeMapping()
         {
             CreateMap(typeof(ResponseGenerico<>), typeof(ResponseGenerico<>));
-            CreateMap<EnderecoResponse, EnderecoModel>();
-            CreateMap<EnderecoModel, EnderecoResponse>();
+            CreateMap<FipeResponse, FipeModel>();
+            CreateMap<FipeModel, FipeResponse>();
         }
     }
     

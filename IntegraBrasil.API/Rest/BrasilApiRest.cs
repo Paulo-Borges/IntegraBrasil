@@ -1,7 +1,9 @@
-﻿using IntegraBrasil.API.DTOs;
+﻿using Azure;
+using IntegraBrasil.API.DTOs;
 using IntegraBrasil.API.Interfaces;
 using IntegraBrasil.API.Models;
 using System.Dynamic;
+using System.Net;
 using System.Runtime.ConstrainedExecution;
 using System.Text.Json;
 
@@ -60,9 +62,54 @@ namespace IntegraBrasil.API.Rest
             return response;
         }
 
-        public Task<ResponseGenerico<FipeModel>> BuscarFipe(string veiculo)
+        public async Task<ResponseGenerico<FipeModel>> BuscarFipe(string veiculo)
         {
-            throw new NotImplementedException();
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://brasilapi.com.br/api/fipe/preco/v1/{veiculo}");
+            var response = new ResponseGenerico<FipeModel>();
+
+            using (var client = new HttpClient())
+            {
+                var responseBrasilApi = await client.SendAsync(request);
+                var contentResp = await responseBrasilApi.Content.ReadAsStringAsync();
+
+                // Se a origem FIPE bloquear (403), trate como dependência indisponível
+                if (responseBrasilApi.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    response.CodigoHttp = HttpStatusCode.ServiceUnavailable;
+                    dynamic erro = new ExpandoObject();
+                    erro.mensagem = "Serviço FIPE de origem bloqueou a consulta (403). Tente novamente mais tarde.";
+                    erro.origem = "BrasilAPI/FIPE";
+                    response.ErrosRetorno = erro;
+                    return response;
+                }
+
+                response.CodigoHttp = responseBrasilApi.StatusCode;
+
+                if (responseBrasilApi.IsSuccessStatusCode)
+                {
+                    // /preco/v1/{codigoFipe} costuma retornar LISTA
+                    var lista = JsonSerializer.Deserialize<List<FipeModel>>(contentResp);
+                    response.DadosRetorno = lista?.FirstOrDefault();
+                }
+                else
+                {
+                    var mediaType = responseBrasilApi.Content.Headers.ContentType?.MediaType;
+
+                    if (mediaType is not null && mediaType.Contains("json"))
+                    {
+                        response.ErrosRetorno = JsonSerializer.Deserialize<ExpandoObject>(contentResp);
+                    }
+                    else
+                    {
+                        dynamic erro = new ExpandoObject();
+                        erro.mensagem = "Resposta inválida da API FIPE.";
+                        erro.conteudo = contentResp;
+                        response.ErrosRetorno = erro;
+                    }
+                }
+            }
+
+            return response;
         }
 
         public async Task<ResponseGenerico<BancoModel>> BuscarBanco(string codigoBanco)
