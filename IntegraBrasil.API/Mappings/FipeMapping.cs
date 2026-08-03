@@ -4,14 +4,14 @@ using IntegraBrasil.API.Models;
 
 namespace IntegraBrasil.API.Mappings
 {
-    public class BancoMapping : Profile
+    public class FipeMapping : Profile
     {
-        public BancoMapping()
+        public FipeMapping()
         {
             CreateMap(typeof(ResponseGenerico<>), typeof(ResponseGenerico<>));
-            CreateMap<BancoResponse, BancoModel>();
-            CreateMap<BancoModel, BancoResponse>();
+            CreateMap<EnderecoResponse, EnderecoModel>();
+            CreateMap<EnderecoModel, EnderecoResponse>();
         }
-
     }
+    
 }

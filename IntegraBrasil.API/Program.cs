@@ -7,27 +7,29 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+//builder.Services.AddOpenApi();
 
 builder.Services.AddSwaggerGen();
+
 
 
 builder.Services.AddSingleton<IEnderecoService, EnderecoService>();
 builder.Services.AddSingleton<IBancoService, BancoService>();
 builder.Services.AddSingleton<IBrasilApi, BrasilApiRest>();
-//builder.Services.AddSingleton<ICambioService, CambioService>();
-//builder.Services.AddSingleton<IFipeService, FipeService>();
+builder.Services.AddSingleton<ICambioService, CambioService>();
+builder.Services.AddSingleton<IFipeService, FipeService>();
 
 builder.Services.AddAutoMapper(config => { 
 
-},typeof(EnderecoMapping), typeof(BancoMapping));
+},typeof(EnderecoMapping), typeof(BancoMapping), typeof(CambioMapping), typeof(FipeMapping));
 
 //builder.Services.AddAutoMapper(typeof(EnderecoMapping));
 //builder.Services.AddAutoMapper(typeof(BancoMapping));
 //builder.Services.AddAutoMapper(typeof(CambioMapping));
 //builder.Services.AddAutoMapper(typeof(FipeMapping));
+
+builder.Services.AddControllers();
 
 var app = builder.Build();
 

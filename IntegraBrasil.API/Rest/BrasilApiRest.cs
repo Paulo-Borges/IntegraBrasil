@@ -9,9 +9,29 @@ namespace IntegraBrasil.API.Rest
 {
     public class BrasilApiRest : IBrasilApi
     {
-        public Task<ResponseGenerico<CambioModel>> BuscarCambio(string moeda)
+        public async Task<ResponseGenerico<List<CambioModel>>> BuscarCambio()
         {
-            throw new NotImplementedException();
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://brasilapi.com.br/api/cambio/v1/moedas");
+
+            var response = new ResponseGenerico<List<CambioModel>>();
+            using (var client = new HttpClient())
+            {
+                var responseBrasilApi = await client.SendAsync(request);
+                var contentResp = await responseBrasilApi.Content.ReadAsStringAsync();
+                var objResponse = JsonSerializer.Deserialize<List<CambioModel>>(contentResp);
+
+                if (responseBrasilApi.IsSuccessStatusCode)
+                {
+                    response.CodigoHttp = responseBrasilApi.StatusCode;
+                    response.DadosRetorno = objResponse;
+                }
+                else
+                {
+                    response.CodigoHttp = responseBrasilApi.StatusCode;
+                    response.ErrosRetorno = JsonSerializer.Deserialize<ExpandoObject>(contentResp);
+                }
+            }
+            return response;
         }
 
         public async Task<ResponseGenerico<EnderecoModel>> BuscarEnderecoPorCEP(string cep)

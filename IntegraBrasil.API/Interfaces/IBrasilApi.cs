@@ -14,6 +14,6 @@ namespace IntegraBrasil.API.Interfaces
 
         Task<ResponseGenerico<FipeModel>> BuscarFipe(string veiculo);
 
-        Task<ResponseGenerico<CambioModel>> BuscarCambio(string moeda);
+        Task<ResponseGenerico<List<CambioModel>>> BuscarCambio();
     }
 }
