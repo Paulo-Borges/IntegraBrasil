@@ -20,8 +20,12 @@ builder.Services.AddSingleton<IBrasilApi, BrasilApiRest>();
 //builder.Services.AddSingleton<ICambioService, CambioService>();
 //builder.Services.AddSingleton<IFipeService, FipeService>();
 
-builder.Services.AddAutoMapper(typeof(EnderecoMapping));
-builder.Services.AddAutoMapper(typeof(BancoMapping));
+builder.Services.AddAutoMapper(config => { 
+
+},typeof(EnderecoMapping), typeof(BancoMapping));
+
+//builder.Services.AddAutoMapper(typeof(EnderecoMapping));
+//builder.Services.AddAutoMapper(typeof(BancoMapping));
 //builder.Services.AddAutoMapper(typeof(CambioMapping));
 //builder.Services.AddAutoMapper(typeof(FipeMapping));
 
